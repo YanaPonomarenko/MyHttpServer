@@ -4,100 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мой сайт</title>
-
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        nav {
-            background-color: #555;
-            padding: 10px;
-            text-align: center;
-        }
-
-        nav a {
-            color: white;
-            margin: 0 10px;
-            text-decoration: none;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-        }
-
-        main {
-            padding: 20px;
-            text-align: center;
-        }
-
-        footer {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            padding: 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="/styles/style.css">
 </head>
-
-<body>
-
+<body class="nav-page">
     <header>
         <h1>Добро пожаловать на мой сайт</h1>
     </header>
 
     <nav>
-        <a href="#">Главная</a>
-        <a href="/student">Студенти</a>
-        <a href="#">О нас</a>
-        <a href="#">Контакты</a>
-
-
+        <a href="index.html">Главная</a>
+        <a href="about.html">Про подорожі</a>
+        <a href="contacts.html">Контакти</a>
     </nav>
 
-
     <form action="/" method="post">
-        <input type="text" name="login" />
-        <input type="password" name="pwd" />
-        <input type="submit" value="Send" />
-        </form>
+        <input type="text" name="login" placeholder="Логин">
+        <input type="password" name="pwd" placeholder="Пароль">
+        <input type="submit" value="Send">
+    </form>
 
-        <main>
-            <h2>Главная страница</h2>
-            <p>Это мой первый сайт 🎉</p>
+    <main>
+        <h2>Главная страница</h2>
+        <p>Это мой первый сайт 🎉</p>
+        <a href="about.html" class="btn">Подробнее</a>
+    </main>
 
-            <a href="#" class="btn">Подробнее</a>
-        </main>
-
-        <footer>
-            <p>© 2026 Мой сайт</p>
-        </footer>
-
+    <footer>
+        <p>© 2026 Мой сайт</p>
+    </footer>
 </body>
 </html>

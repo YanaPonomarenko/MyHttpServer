@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Resources;
 using System.Text;
+using System.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -31,7 +33,8 @@ internal class Server
 {
     readonly string _HOST = "http://127.0.0.1:8081/";
 
-    private List<Student> _students; 
+    private List<Student> _students;
+    private List<User> _users;
 
     public Server()
     {
@@ -49,6 +52,7 @@ internal class Server
             new Student { Id = 9, Name = "Олександр", Surname = "Кравченко", Group = "КН-202" },
             new Student { Id = 10, Name = "Тетяна", Surname = "Олійник", Group = "КН-202" }
         };
+        _users = new List<User>();
     }
 
     public async Task RunServer()
@@ -61,9 +65,10 @@ internal class Server
         {
             try
             {
-
                 HttpListenerContext ctx = await server.GetContextAsync();
                 HttpListenerRequest req = ctx.Request;
+                HttpListenerResponse response = ctx.Response; 
+
                 if (req.HttpMethod == "GET")
                 {
                     Console.WriteLine($"Request: {req.Url} {req.HttpMethod} {req.Url?.AbsolutePath}");
@@ -74,56 +79,61 @@ internal class Server
                         string idString = param.Substring("/student/".Length);
                         if (int.TryParse(idString, out int id))
                         {
-                            await GetStudentById(ctx.Response, id);
+                            await GetStudentById(response, id);
                             continue;
                         }
                     }
 
                     if (param == "/student")
                     {
-                        await GetAllStudents(ctx.Response);
+                        await GetAllStudents(response);
                         continue;
                     }
-                    if (param != null)
-                    {
-                        param = "/";
-                    if(param != null)
-                        {
-                            var queryString = req.QueryString;
-                            if (queryString != null)
-                            {
-                                Console.WriteLine($"QUERY PARAMS: {queryString["login"]} {queryString["pwd"]}");
-                            }
-                        }
-                       
-                    }
-                    string page = GetPageName(param);
-                    HttpListenerResponse res = ctx.Response;
-                    string path = Path.Combine(AppContext.BaseDirectory, "wwwroot", "pages", "index.html");
-                    string html = await File.ReadAllTextAsync(path, req.ContentEncoding);
-                    byte[] bytes = Encoding.UTF8.GetBytes(html);
-                    res.ContentType = "text/html; charset=utf-8";
-                    res.StatusCode = 200;
 
-                    using (Stream stream = res.OutputStream)
+                    string page = GetPageName(param);
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", page);
+
+                    if (!File.Exists(path))
                     {
-                        stream.Write(bytes, 0, bytes.Length);
+                        path = Path.Combine(AppContext.BaseDirectory, "wwwroot", "404.html");
                     }
-                    res.Close();
+
+                    string html = await File.ReadAllTextAsync(path, Encoding.UTF8);
+                    byte[] bytes = Encoding.UTF8.GetBytes(html);
+                    response.ContentType = "text/html; charset=utf-8";
+                    response.StatusCode = 200;
+
+                    using (Stream stream = response.OutputStream)
+                    {
+                        await stream.WriteAsync(bytes, 0, bytes.Length);
+                    }
+                    response.Close();
                 }
                 else if (req.HttpMethod == "POST")
                 {
                     string body = "";
-                    using(var reader = new StreamReader(req.InputStream,req.ContentEncoding))
+                    using (var reader = new StreamReader(req.InputStream, req.ContentEncoding))
                     {
                         body = await reader.ReadToEndAsync();
                         try
                         {
-                            var user = JsonSerializer.Deserialize<User>(body);
+                            var formData = System.Web.HttpUtility.ParseQueryString(body);
+                            Console.WriteLine($"Login: {formData["login"]} Password {formData["pwd"]}");
+
+                           
+                            response.StatusCode = 302;
+                            response.Redirect(_HOST);
+                            response.Close();
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message);
+                            
+                            byte[] errorBytes = Encoding.UTF8.GetBytes("<html><body><h1>Помилка</h1></body></html>");
+                            response.ContentType = "text/html; charset=utf-8";
+                            response.StatusCode = 400;
+                            await response.OutputStream.WriteAsync(errorBytes, 0, errorBytes.Length);
+                            response.Close();
                         }
                     }
                 }

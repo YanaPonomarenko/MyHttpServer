@@ -1,0 +1,242 @@
+﻿body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
+}
+
+    body.nav-page {
+        background-color: #f5f5f5;
+    }
+
+.nav-page header {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.nav-page nav {
+    background-color: #555;
+    padding: 10px;
+    text-align: center;
+}
+
+    .nav-page nav a {
+        color: white;
+        margin: 0 10px;
+        text-decoration: none;
+    }
+
+        .nav-page nav a:hover {
+            text-decoration: underline;
+        }
+
+.nav-page main {
+    padding: 20px;
+    text-align: center;
+}
+
+.nav-page footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.btn {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+    .btn:hover {
+        background-color: #0056b3;
+    }
+
+body.about-page {
+    background-color: #f0f8ff;
+}
+
+.about-page header {
+    background: url('/images/header-bg.jpg') center/cover;
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.about-page nav {
+    background-color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+    .about-page nav a {
+        margin: 0 15px;
+        text-decoration: none;
+        color: #333;
+        font-weight: 500;
+    }
+
+        .about-page nav a:hover {
+            color: #0077cc;
+        }
+
+.about-page main {
+    padding: 40px 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+    text-align: center;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card img {
+        width: 100%;
+        max-width: 300px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+body.contacts-page {
+    background-color: #f0f8ff;
+}
+
+.contacts-page header {
+    background-color: #0077cc;
+    color: white;
+    padding: 40px;
+    text-align: center;
+}
+
+.contacts-page nav {
+    background-color: #ffffff;
+    padding: 10px;
+    text-align: center;
+}
+
+    .contacts-page nav a {
+        margin: 0 15px;
+        text-decoration: none;
+        color: #333;
+    }
+
+        .contacts-page nav a:hover {
+            color: #0077cc;
+        }
+
+.contacts-page main {
+    padding: 40px 20px;
+    min-height: calc(100vh - 300px);
+}
+
+.contact-box {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.contact-item {
+    margin: 15px 0;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+    .contact-item strong {
+        color: #0077cc;
+    }
+
+body.error-page {
+    background: url('/images/404-bg.jpg') center/cover no-repeat;
+    height: 100vh;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.overlay {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 40px;
+    border-radius: 15px;
+}
+
+.error-page h1 {
+    font-size: 80px;
+    margin: 0;
+}
+
+.error-page p {
+    font-size: 20px;
+}
+
+.error-page a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #00aaff;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+    .error-page a:hover {
+        background-color: #008ecc;
+    }
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #ffffff;
+    margin-top: 30px;
+    border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+    .about-page header {
+        padding: 40px 15px;
+    }
+
+    .about-page nav a,
+    .contacts-page nav a {
+        margin: 0 10px;
+        font-size: 14px;
+    }
+
+    .error-page h1 {
+        font-size: 40px;
+    }
+
+    .container {
+        padding: 0 15px;
+    }
+
+    .contact-box {
+        margin: 0 15px;
+    }
+}
