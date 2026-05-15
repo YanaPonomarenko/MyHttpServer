@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Реєстрація</title>
+</head>
+<body>
+    <h1>Реєстрація клієнта</h1>
+    <form action="/register" method="post">
+        <p>
+            <label>Логін:</label><br>
+            <input type="text" name="login" required>
+        </p>
+        <p>
+            <label>Email:</label><br>
+            <input type="email" name="email" required>
+        </p>
+        <p>
+            <label>Пароль:</label><br>
+            <input type="password" name="pwd" required>
+        </p>
+        <p>
+            <label>Підтвердіть пароль:</label><br>
+            <input type="password" name="confirm_pwd" required>
+        </p>
+        <button type="submit">Зареєструватися</button>
+    </form>
+    <br>
+    <a href="/">На головну</a>
+</body>
+</html>
