@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Mail;
 using System.Resources;
 using System.Text;
+using System.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Web;
+using System.IO;
+using System.Net.Mail;
 
 namespace MyHttpServer;
 
@@ -16,7 +16,7 @@ class User
 {
     public string Login { get; set; } = null!;
     public string Pwd { get; set; } = null!;
-    public string Email { get; set; } = null!;
+    public string Email { get; set; } = null!; 
 }
 
 public class Student
@@ -126,70 +126,84 @@ internal class Server
                     using (var reader = new StreamReader(req.InputStream, req.ContentEncoding))
                     {
                         body = await reader.ReadToEndAsync();
-                        var formData = HttpUtility.ParseQueryString(body);
-
-                        if (req.Url?.AbsolutePath == "/register")
+                        try
                         {
-                            string login = formData["login"] ?? "";
-                            string email = formData["email"] ?? "";
-                            string pwd = formData["pwd"] ?? "";
-                            string confirmPwd = formData["confirm_pwd"] ?? "";
-
-                            if (pwd != confirmPwd)
+                            if (req.Url?.AbsolutePath == "/student")
                             {
-                                string html = "<html><body><h1>Помилка! Паролі не співпадають</h1><a href='/register'>Назад</a></body></html>";
-                                byte[] errorBytes = Encoding.UTF8.GetBytes(html);
-                                response.ContentType = "text/html; charset=utf-8";
-                                await response.OutputStream.WriteAsync(errorBytes, 0, errorBytes.Length);
-                                response.Close();
-                                return;
-                            }
+                                var formData = HttpUtility.ParseQueryString(body);
 
-                            if (_users.Any(u => u.Login == login))
+                                int newId = _students.Max(s => s.Id) + 1;
+                                Student newStudent = new Student
+                                {
+                                    Id = newId,
+                                    Name = formData["Name"] ?? "",
+                                    Surname = formData["Surname"] ?? "",
+                                    Group = formData["Group"] ?? ""
+                                };
+
+                                _students.Add(newStudent);
+
+                                string successHtml = $"<html><head><meta charset='UTF-8'></head><body><h1>Студента додано!</h1><p>ID: {newId}</p><a href='/student'>Назад до списку</a></body></html>";
+                                byte[] bytes = Encoding.UTF8.GetBytes(successHtml);
+                                response.ContentType = "text/html; charset=utf-8";
+                                response.StatusCode = 200;
+                                await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+                            }
+                            else if (req.Url?.AbsolutePath == "/register")
                             {
-                                string html = "<html><body><h1>Помилка! Користувач вже існує</h1><a href='/register'>Назад</a></body></html>";
-                                byte[] errorBytes = Encoding.UTF8.GetBytes(html);
+                                var formData = HttpUtility.ParseQueryString(body);
+                                string login = formData["login"] ?? "";
+                                string email = formData["email"] ?? "";
+                                string pwd = formData["pwd"] ?? "";
+                                string confirmPwd = formData["confirm_pwd"] ?? "";
+
+                                if (pwd != confirmPwd)
+                                {
+                                    string html = "<html><body><h1>Помилка! Паролі не співпадають</h1><a href='/register'>Назад</a></body></html>";
+                                    byte[] bytes = Encoding.UTF8.GetBytes(html);
+                                    response.ContentType = "text/html; charset=utf-8";
+                                    await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+                                    response.Close();
+                                    return;
+                                }
+
+                                if (_users.Any(u => u.Login == login))
+                                {
+                                    string html = "<html><body><h1>Помилка! Користувач вже існує</h1><a href='/register'>Назад</a></body></html>";
+                                    byte[] bytes = Encoding.UTF8.GetBytes(html);
+                                    response.ContentType = "text/html; charset=utf-8";
+                                    await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
+                                    response.Close();
+                                    return;
+                                }
+
+                                User newUser = new User { Login = login, Pwd = pwd, Email = email };
+                                _users.Add(newUser);
+
+                                EmailService emailService = new EmailService();
+                                emailService.SendEmail(email, login);
+
+                                string successHtml = $"<html><body><h1>Реєстрація успішна!</h1><p>Вітаємо, {login}!</p><p>Лист відправлено на {email}</p><a href='/'>На головну</a></body></html>";
+                                byte[] successBytes = Encoding.UTF8.GetBytes(successHtml);
                                 response.ContentType = "text/html; charset=utf-8";
-                                await response.OutputStream.WriteAsync(errorBytes, 0, errorBytes.Length);
-                                response.Close();
-                                return;
+                                await response.OutputStream.WriteAsync(successBytes, 0, successBytes.Length);
                             }
-
-                            User newUser = new User { Login = login, Pwd = pwd, Email = email };
-                            _users.Add(newUser);
-
-                            EmailService emailService = new EmailService();
-                            emailService.SendEmail(email, login);
-
-                            string successHtml = $"<html><body><h1>Реєстрація успішна!</h1><p>Вітаємо, {login}!</p><p>Лист відправлено на {email}</p><a href='/'>На головну</a></body></html>";
-                            byte[] successBytes = Encoding.UTF8.GetBytes(successHtml);
-                            response.ContentType = "text/html; charset=utf-8";
-                            await response.OutputStream.WriteAsync(successBytes, 0, successBytes.Length);
+                            else
+                            {
+                                var formData = HttpUtility.ParseQueryString(body);
+                                Console.WriteLine($"Login: {formData["login"]} Password {formData["pwd"]}");
+                                response.StatusCode = 302;
+                                response.Redirect(_HOST);
+                            }
                             response.Close();
                         }
-                        else if (req.Url?.AbsolutePath == "/student")
+                        catch (Exception ex)
                         {
-                            int newId = _students.Max(s => s.Id) + 1;
-                            Student newStudent = new Student
-                            {
-                                Id = newId,
-                                Name = formData["Name"] ?? "",
-                                Surname = formData["Surname"] ?? "",
-                                Group = formData["Group"] ?? ""
-                            };
-                            _students.Add(newStudent);
-
-                            string successHtml = $"<html><body><h1>Студента додано</h1><p>ID: {newId}</p><a href='/student'>Назад</a></body></html>";
-                            byte[] bytes = Encoding.UTF8.GetBytes(successHtml);
+                            Console.WriteLine(ex.Message);
+                            byte[] errorBytes = Encoding.UTF8.GetBytes("<html><body><h1>Помилка</h1></body></html>");
                             response.ContentType = "text/html; charset=utf-8";
-                            await response.OutputStream.WriteAsync(bytes, 0, bytes.Length);
-                            response.Close();
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Login: {formData["login"]} Password {formData["pwd"]}");
-                            response.StatusCode = 302;
-                            response.Redirect(_HOST);
+                            response.StatusCode = 400;
+                            await response.OutputStream.WriteAsync(errorBytes, 0, errorBytes.Length);
                             response.Close();
                         }
                     }
@@ -358,7 +372,7 @@ internal class Server
             "/contacts" => "contacts.html",
             "/about" => "about.html",
             "/" => "index.html",
-            "/register" => "register.html",
+            "/layout" => "layout.html", 
             _ => "notfound.html"
         };
         return result;
